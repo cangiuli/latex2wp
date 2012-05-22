@@ -1,0 +1,19 @@
+\documentclass{article}
+\usepackage{pb-diagram}
+
+% doesn't expand macros outside of math mode??
+\newcommand{\custommacro}[1]{\langle #1 \rangle}
+
+\begin{document}
+
+Text with inline math $x$.
+
+$\custommacro{x}$
+
+\[\begin{diagram}
+\node{f(x)} \arrow{e,t}{p_x} \arrow{s,l}{f_*q} \node{g(x)} \arrow{s,r}{g_*q} \\
+\node{f(y)} \arrow{e,t}{p_y} \node{g(y)}
+\end{diagram}\]
+
+\end{document}
+
