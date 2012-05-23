@@ -44,6 +44,7 @@ wpLatex e = case e of
 displayMath x = do
   (stdin,stdout,_,_) <- runInteractiveCommand "./math2png"
   hPutStr stdin x
+  hClose stdin
   filename <- hGetContents stdout
   return $ Image [] (filename,x)
 
