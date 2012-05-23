@@ -8,6 +8,7 @@ import System.Process
 import System.IO
 import System.Environment
 import System.FilePath.Posix
+import Data.Hash.MD5
 
 -- Main
 
@@ -26,6 +27,8 @@ usage = unlines
    "Uses WP-LaTeX syntax ($latex $) for inline math,",
    "and converts display math to PNG."]
 
+tmpDir = "/tmp"
+
 -- Rewriting Pandoc
 
 readDoc = readLaTeX defaultParserState
@@ -43,9 +46,23 @@ wpLatex e = case e of
 -- Render display math
 
 displayMath x = do
-  (stdin,stdout,_,_) <- runInteractiveCommand "./math2png"
-  hPutStr stdin x
-  hClose stdin
-  filename <- hGetContents stdout
-  return $ Image [] (filename,x)
+  let hash = md5s (Data.Hash.MD5.Str x)
+  let name = tmpDir ++ "/" ++ hash
+  writeFile (name ++ ".tex") (latexSrc x)
+  runCmd $ "pdflatex -output-directory " ++ tmpDir ++ " " ++ name ++ ".tex"
+  runCmd $ "convert -density 120 -trim " ++ name ++ ".pdf " ++ name ++ ".png"
+  runCmd $ "mv -f " ++ name ++ ".png ."
+  return $ Image [] (hash ++ ".png",x)
+
+runCmd s = createProcess $ (shell s) {std_out = CreatePipe}
+
+latexSrc x = unlines
+  ["\\documentclass{article}",
+   "\\usepackage{amsmath}",
+   "\\usepackage{amssymb}",
+   "\\usepackage{pb-diagram}",
+   "\\pagestyle{empty}",
+   "\\begin{document} \\[",
+   x,
+   "\\] \\end{document}"]
 
