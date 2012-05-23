@@ -54,7 +54,6 @@ displayMath x = do
     name ++ ".tex && " ++
     "convert -density 144 -trim " ++ name ++ ".pdf " ++ name ++ ".png && " ++
     "mv -f " ++ name ++ ".png ."
-  --hClose stdout
   return $ Image [] (hash ++ ".png",x)
 
 latexSrc x = unlines
