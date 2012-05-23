@@ -1,7 +1,13 @@
-.PHONY: test
+.PHONY: test clean cleanall
 
-test: tests/test.tex
-	runhaskell latex2wp.hs tests/test.tex
+latex2wp: latex2wp.hs
+	ghc --make $<
+
+test: latex2wp tests/test.tex
+	./latex2wp tests/test.tex
 
 clean:
-	-rm -f *.png *.html
+	-rm -f *.hi *.o *.png *.html
+
+cleanall: clean
+	-rm latex2wp

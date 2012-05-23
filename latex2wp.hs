@@ -8,7 +8,8 @@ import System.Process
 import System.IO
 import System.Environment
 import System.FilePath.Posix
-import Debug.Trace
+
+-- Main
 
 main = do
   args <- getArgs
@@ -25,14 +26,13 @@ usage = unlines
    "Uses WP-LaTeX syntax ($latex $) for inline math,",
    "and converts display math to PNG."]
 
--- Going from/to Pandoc
--- Translates $x$ to <span class="LaTeX">$x$</span>
+-- Rewriting Pandoc
 
 readDoc = readLaTeX defaultParserState
+
+-- $x$ --> <span class="LaTeX">$x$</span>
 writeDoc = writeHtmlString $
   defaultWriterOptions {writerHTMLMathMethod = LaTeXMathML Nothing}
-
--- Rewriting Pandoc
 
 wpLatex e = case e of
   -- start inline math with $latex
@@ -40,7 +40,8 @@ wpLatex e = case e of
   Math DisplayMath x -> displayMath x
   _ -> return e
 
--- render display math with math2png script
+-- Render display math
+
 displayMath x = do
   (stdin,stdout,_,_) <- runInteractiveCommand "./math2png"
   hPutStr stdin x
