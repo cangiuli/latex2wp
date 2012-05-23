@@ -1,4 +1,7 @@
 #!/usr/bin/perl
+# math2png
+# Carlo Angiuli
+# For use with latex2wp
 
 use strict;
 use warnings;
