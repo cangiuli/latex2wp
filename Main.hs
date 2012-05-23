@@ -2,18 +2,33 @@ module Main where
 
 import Text.Pandoc
 import System.Process
+import System.IO
 
-wpLatex (Math InlineMath y) = Math InlineMath ("latex " ++ y)
---TODO
-wpLatex (Math DisplayMath y) = Str $ "$latex " ++ y ++ "$"
-wpLatex x = x
+main = do
+  latex <- getContents
+  pandoc <- bottomUpM wpLatex $ readDoc latex
+  putStrLn $ writeDoc pandoc
 
-readDoc :: String -> Pandoc
+-- Going from/to Pandoc
+-- Translates $x$ to <span class="LaTeX">$x$</span>
+
 readDoc = readLaTeX defaultParserState
-
-writeDoc :: Pandoc -> String
 writeDoc = writeHtmlString $
   defaultWriterOptions {writerHTMLMathMethod = LaTeXMathML Nothing}
 
-main = interact (writeDoc . bottomUp wpLatex . readDoc)
+-- Rewriting Pandoc
+
+wpLatex e = case e of
+  -- start inline math with $latex
+  Math InlineMath x -> return $ Math InlineMath ("latex " ++ x)
+  Math DisplayMath x -> displayMath x
+  _ -> return e
+
+-- render display math with latex2png script
+-- TODO alt/title text
+displayMath x = do
+  (stdin,stdout,_,_) <- runInteractiveCommand "./math2png"
+  hPutStr stdin x
+  filename <- hGetContents stdout
+  return $ Image [] (filename,"")
 
