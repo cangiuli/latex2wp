@@ -28,9 +28,9 @@ open(my $fh, '>', "$filename.tex");
 print $fh $src;
 close $fh;
 
-`pdflatex -output-directory $tmpdir $filename.tex`;
-`convert -density 120 -trim $filename.pdf $filename.png`;
-`mv -f $filename.png .`;
+`pdflatex -output-directory $tmpdir $filename.tex &&
+ convert -density 120 -trim $filename.pdf $filename.png &&
+ mv -f $filename.png .`;
 
 print "$md5.png";
 

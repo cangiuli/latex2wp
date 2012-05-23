@@ -7,13 +7,16 @@ import Text.Pandoc
 import System.Process
 import System.IO
 import System.Environment
+import System.FilePath.Posix
+import Debug.Trace
 
 main = do
   args <- getArgs
   if null args then putStr usage else do
-  latex <- readFile $ head args
+  let filename = head args
+  latex <- readFile filename
   pandoc <- bottomUpM wpLatex $ readDoc latex
-  putStrLn $ writeDoc pandoc
+  writeFile (takeBaseName filename ++ ".html") $ writeDoc pandoc
 
 usage = unlines
   ["Usage: latex2wp filename",
