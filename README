@@ -1,9 +1,0 @@
-latex2wp
-
-LaTeX -> WordPress utility built on Pandoc.
-
-Dependencies:
-- Haskell (including Text.Pandoc, Data.Hash.MD5)
-- pdflatex
-- ImageMagick
-

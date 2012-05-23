@@ -3,8 +3,8 @@
 latex2wp: latex2wp.hs
 	ghc --make $<
 
-test: latex2wp tests/test.tex
-	./latex2wp tests/test.tex
+test: example.tex latex2wp
+	./latex2wp $<
 
 clean:
 	-rm -f *.hi *.o *.png *.html

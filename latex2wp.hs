@@ -49,12 +49,13 @@ displayMath x = do
   let hash = md5s (Data.Hash.MD5.Str x)
   let name = tmpDir ++ "/" ++ hash
   writeFile (name ++ ".tex") (latexSrc x)
-  runCmd $ "pdflatex -output-directory " ++ tmpDir ++ " " ++ name ++ ".tex"
-  runCmd $ "convert -density 120 -trim " ++ name ++ ".pdf " ++ name ++ ".png"
-  runCmd $ "mv -f " ++ name ++ ".png ."
+  system $ 
+    "pdflatex -interaction=batchmode -output-directory " ++ tmpDir ++ " " ++
+    name ++ ".tex && " ++
+    "convert -density 144 -trim " ++ name ++ ".pdf " ++ name ++ ".png && " ++
+    "mv -f " ++ name ++ ".png ."
+  --hClose stdout
   return $ Image [] (hash ++ ".png",x)
-
-runCmd s = createProcess $ (shell s) {std_out = CreatePipe}
 
 latexSrc x = unlines
   ["\\documentclass{article}",

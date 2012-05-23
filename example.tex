@@ -1,0 +1,18 @@
+\documentclass{article}
+\usepackage{pb-diagram}
+\newcommand{\custommacro}[1]{\langle #1 \rangle}
+
+\begin{document}
+
+Text with inline math $x$, and a custom macro $\custommacro{x}$.
+
+\[\begin{diagram}
+\node[2]{C} \arrow{s,r,..}{f} \arrow{sw,l}{f_1} \arrow{se,l}{f_2} \\
+\node{A} \node{A\times B} \arrow{w,t}{\pi_1} \arrow{e,t}{\pi_2}
+\node{B}
+\end{diagram}\]
+
+Explanatory text here.
+
+\end{document}
+
