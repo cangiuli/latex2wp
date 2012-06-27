@@ -61,6 +61,7 @@ latexSrc x = unlines
    "\\usepackage{amsmath}",
    "\\usepackage{amssymb}",
    "\\usepackage{pb-diagram}",
+   "\\usepackage{proof}",
    "\\pagestyle{empty}",
    "\\begin{document} \\[",
    x,
