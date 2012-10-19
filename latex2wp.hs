@@ -21,7 +21,7 @@ main = do
   latex <- readFile filename
   let preamble = getPreamble latex
   let doc = readDoc latex
-  pandoc <- bottomUpM (wpLatex (outputDir opts,tempDir opts,preamble)) doc
+  pandoc <- bottomUpM (wpLatex (opts,preamble)) doc
   writeFile (outputDir opts </> filename <.> "html") $ writeDoc pandoc
 
 getPreamble latex = Text.unpack preamble
@@ -31,11 +31,13 @@ getPreamble latex = Text.unpack preamble
 -- CLI
 
 data Options = Options
-  { outputDir :: String
+  { imgSrc :: String
+  , outputDir :: String
   , tempDir :: String }
 
 defaultOptions = Options
-  { outputDir = "."
+  { imgSrc = ""
+  , outputDir = "."
   , tempDir = "/tmp" }
 
 parseArgs = do
@@ -52,6 +54,10 @@ usage = unlines
    "and converts display math to PNG."]
 
 options = [
+  Option ['i'] ["img-src"]
+    (ReqArg (\path opts -> opts { imgSrc = path }) "PATH") $
+    "Prepend PATH to image URLs in HTML.\n" ++
+    "Does not affect where images will be saved.",
   Option ['o'] ["output-dir"]
     (ReqArg (\dir opts -> opts { outputDir = dir }) "DIR")
     "Output to DIR instead of current directory.",
@@ -68,16 +74,17 @@ readDoc = readLaTeX defaultParserState
 writeDoc = writeHtmlString $
   defaultWriterOptions {writerHTMLMathMethod = LaTeXMathML Nothing}
 
-wpLatex (outputDir,tmpDir,preamble) e = case e of
+wpLatex opts e = case e of
   -- start inline math with $latex
   Math InlineMath x -> return $ Math InlineMath ("latex " ++ x)
-  Math DisplayMath x -> displayMath (outputDir,tmpDir,preamble) x
+  Math DisplayMath x -> displayMath opts x
   _ -> return e
 
 -- }}}
 -- Render display math {{{
 
-displayMath (outputDir,tmpDir,preamble) x = do
+displayMath (opts,preamble) x = do
+  let tmpDir = tempDir opts
   let hash = md5s (Data.Hash.MD5.Str x)
   let name = tmpDir </> hash
   writeFile (name ++ ".tex") (preamble ++ latexSrc x)
@@ -85,8 +92,8 @@ displayMath (outputDir,tmpDir,preamble) x = do
     "pdflatex -interaction=batchmode -output-directory " ++ tmpDir ++ " " ++
     name ++ ".tex && " ++
     "convert -density 144 -trim " ++ name ++ ".pdf " ++ name ++ ".png && " ++
-    "mv -f " ++ name ++ ".png " ++ outputDir
-  return $ Image [] (hash ++ ".png",x)
+    "mv -f " ++ name ++ ".png " ++ (outputDir opts)
+  return $ Image [] (imgSrc opts ++ hash ++ ".png",x)
 
 latexSrc x = unlines
   ["\\pagestyle{empty}",

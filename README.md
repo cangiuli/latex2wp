@@ -12,8 +12,10 @@ Usage
     Uses WP-LaTeX syntax ($latex $) for inline math,
     and converts display math to PNG.
     
-      -o DIR  --output-dir=DIR  Output to DIR instead of current directory.
-      -t DIR  --temp-dir=DIR    Use DIR for temporary files instead of /tmp.
+      -i PATH  --img-src=PATH    Prepend PATH to image URLs in HTML.
+                                 Does not affect where images will be saved.
+      -o DIR   --output-dir=DIR  Output to DIR instead of current directory.
+      -t DIR   --temp-dir=DIR    Use DIR for temporary files instead of /tmp.
 
 You'll also need
 ----------------
