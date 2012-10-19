@@ -20,13 +20,13 @@ main = do
   (opts,filename) <- parseArgs
   latex <- readFile filename
   let preamble = getPreamble latex
-  let doc = readDoc latex
-  pandoc <- bottomUpM (wpLatex (opts,preamble)) doc
-  writeFile (outputDir opts </> filename <.> "html") $ writeDoc pandoc
+  pandoc <- bottomUpM (wpLatex (opts,preamble)) $ readDoc latex
+  let outputFilename = replaceExtension filename "html"
+  writeFile (outputDir opts </> outputFilename) $ writeDoc pandoc
 
 getPreamble latex = Text.unpack preamble
   where (preamble,_) = Text.breakOn begin (Text.pack latex)
-        begin = Text.pack "\\begin{document}" 
+        begin = Text.pack "\\begin{document}"
 
 -- CLI
 
@@ -84,15 +84,14 @@ wpLatex opts e = case e of
 -- Render display math {{{
 
 displayMath (opts,preamble) x = do
-  let tmpDir = tempDir opts
   let hash = md5s (Data.Hash.MD5.Str x)
-  let name = tmpDir </> hash
+  let name = tempDir opts </> hash
   writeFile (name ++ ".tex") (preamble ++ latexSrc x)
-  system $ 
-    "pdflatex -interaction=batchmode -output-directory " ++ tmpDir ++ " " ++
-    name ++ ".tex && " ++
+  system $
+    "pdflatex -interaction=batchmode -output-directory " ++ tempDir opts ++
+    " " ++ name ++ ".tex && " ++
     "convert -density 144 -trim " ++ name ++ ".pdf " ++ name ++ ".png && " ++
-    "mv -f " ++ name ++ ".png " ++ (outputDir opts)
+    "mv -f " ++ name ++ ".png " ++ outputDir opts
   return $ Image [] (imgSrc opts ++ hash ++ ".png",x)
 
 latexSrc x = unlines
