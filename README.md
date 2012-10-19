@@ -7,7 +7,13 @@ display math is converted to PNG images.
 
 Usage
 -----
-`latex2wp filename`
+Usage: latex2wp [OPTION] ... FILE
+Convert LaTeX input files to HTML source suitable for WordPress.
+Uses WP-LaTeX syntax ($latex $) for inline math,
+and converts display math to PNG.
+
+  -o DIR  --output-dir=DIR  Output to DIR instead of current directory.
+  -t DIR  --temp-dir=DIR    Use DIR for temporary files instead of /tmp.
 
 You'll also need
 ----------------
