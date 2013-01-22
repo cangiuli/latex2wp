@@ -4,6 +4,7 @@
 module Main where
 
 import Text.Pandoc
+import Text.TeXMath.Macros
 import qualified Data.Text as Text
 import System.Exit
 import System.Process
@@ -76,9 +77,13 @@ writeDoc = writeHtmlString $
 
 wpLatex opts e = case e of
   -- start inline math with $latex
-  Math InlineMath x -> return $ Math InlineMath ("latex " ++ x)
+  Math InlineMath x -> return $ Math InlineMath ("latex " ++ inlineMacros x)
   Math DisplayMath x -> displayMath opts x
   _ -> return e
+
+-- any macros to be applied *only* to MathJax output
+inlineMacros x = applyMacros (fst $ parseMacroDefinitions macros) x where
+  macros = "\\renewcommand{\\textsf}[1]{\\mathord{\\sf{\\text{#1}}" ++ "}}"
 
 -- }}}
 -- Render display math {{{
