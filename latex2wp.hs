@@ -83,7 +83,9 @@ wpLatex opts e = case e of
 
 -- any macros to be applied *only* to MathJax output
 inlineMacros x = applyMacros (fst $ parseMacroDefinitions macros) x where
-  macros = "\\renewcommand{\\textsf}[1]{\\mathord{\\sf{\\text{#1}}" ++ "}}"
+  macros = "\\renewcommand{\\textsf}[1]{\\mathord{\\sf{\\text{#1}}" ++ "}}" ++
+           "\\renewcommand{\\llbracket}{[\\![}" ++
+           "\\renewcommand{\\rrbracket}{]\\!]}"
 
 -- }}}
 -- Render display math {{{
