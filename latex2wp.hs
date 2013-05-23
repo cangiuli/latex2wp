@@ -69,11 +69,11 @@ options = [
 -- }}}
 -- Rewriting Pandoc {{{
 
-readDoc = readLaTeX defaultParserState
+readDoc = readLaTeX def
 
 -- $x$ --> <span class="LaTeX">$x$</span>
 writeDoc = writeHtmlString $
-  defaultWriterOptions {writerHTMLMathMethod = LaTeXMathML Nothing}
+  def {writerHTMLMathMethod = LaTeXMathML Nothing}
 
 wpLatex opts e = case e of
   -- start inline math with $latex
