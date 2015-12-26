@@ -4,8 +4,9 @@
 module Main where
 
 import Text.Pandoc
-import Text.TeXMath.Macros
+import Text.TeXMath.Readers.TeX.Macros
 import qualified Data.Text as Text
+import qualified Data.ByteString.Char8 as ByteString
 import System.Exit
 import System.Process
 import System.IO
@@ -13,15 +14,18 @@ import System.Environment
 import System.FilePath.Posix
 import System.Console.GetOpt
 import Control.Monad.Reader
-import Data.Hash.MD5
+import Crypto.Hash
 
 -- Main {{{
+
+-- FIXME
+fromRight (Right x) = x
 
 main = do
   (opts,filename) <- parseArgs
   latex <- readFile filename
   let preamble = getPreamble latex
-  pandoc <- bottomUpM (wpLatex (opts,preamble)) $ readDoc latex
+  pandoc <- bottomUpM (wpLatex (opts,preamble)) $ fromRight $ readDoc latex
   let outputFilename = replaceExtension filename "html"
   writeFile (outputDir opts </> outputFilename) $ writeDoc pandoc
 
@@ -91,7 +95,7 @@ inlineMacros x = applyMacros (fst $ parseMacroDefinitions macros) x where
 -- Render display math {{{
 
 displayMath (opts,preamble) x = do
-  let hash = md5s (Data.Hash.MD5.Str x)
+  let hash = show $ hashWith MD5 (ByteString.pack x)
   let name = tempDir opts </> hash
   writeFile (name ++ ".tex") (preamble ++ latexSrc x)
   system $
