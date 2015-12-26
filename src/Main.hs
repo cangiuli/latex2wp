@@ -4,6 +4,7 @@
 module Main where
 
 import Text.Pandoc
+import Text.Pandoc.Error
 import Text.TeXMath.Readers.TeX.Macros
 import qualified Data.Text as Text
 import qualified Data.ByteString.Char8 as ByteString
@@ -18,14 +19,11 @@ import Crypto.Hash
 
 -- Main {{{
 
--- FIXME
-fromRight (Right x) = x
-
 main = do
   (opts,filename) <- parseArgs
   latex <- readFile filename
   let preamble = getPreamble latex
-  pandoc <- bottomUpM (wpLatex (opts,preamble)) $ fromRight $ readDoc latex
+  pandoc <- bottomUpM (wpLatex (opts,preamble)) $ handleError $ readDoc latex
   let outputFilename = replaceExtension filename "html"
   writeFile (outputDir opts </> outputFilename) $ writeDoc pandoc
 

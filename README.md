@@ -20,6 +20,6 @@ Usage
 You'll also need
 ----------------
 
-- Haskell (Text.Pandoc, Data.Hash.MD5)
+- Haskell (run `stack build` if you have it)
 - pdflatex
 - ImageMagick
